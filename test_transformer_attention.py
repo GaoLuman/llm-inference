@@ -8,11 +8,6 @@ def softmax(x,axis = -1):
     e_x = np.exp(max)
     return e_x/np.sum(e_x,axis=axis, keepdims=True)
 
-#relu函数
-def relu(x):
-    return np.maximum(0,x)
-
-
 def compute_rope_angles(seq_len,head_dim,base=10000.0):
     #计算每个位置的cos和sin
     inv_freq = 1.0 / (base ** (np.arange(0,head_dim,2)/head_dim))
