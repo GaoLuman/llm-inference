@@ -20,14 +20,14 @@ def compute_rope_angles(seq_len,head_dim,base=10000.0):
 #RoPE
 def RoPE(x,cos,sin):
     batch, seq_len, nums_head, head_dim = x.shape
-    x_even = x[..., 0::2]  # (..., head_dim//2)
-    x_odd  = x[..., 1::2]  # (..., head_dim//2)
+    x_even = x[..., 0::2]  # (..., head_dim//2) 最后一维取双数
+    x_odd  = x[..., 1::2]  # (..., head_dim//2) 最后一维取单数
    
     cos_ = cos[:seq_len,None,:]  #shape:(seq_len,1,head_dim/2)
     sin_ = sin[:seq_len,None,:]
     rotated_even = x_even * cos_ - x_odd * sin_
     rotated_odd = x_even * sin_ + x_odd * cos_
-    # 重新交错合并
+    # 重新交错合并，先stack后reshape才能将双数偶数嵌合
     # stack + reshape
     x_rot = np.stack([rotated_even, rotated_odd], axis=-1)
     x_rot = x_rot.reshape(x.shape) #(batch,seq_len,nums_head_head_dim)
@@ -38,6 +38,8 @@ def attention_compute(q, k, v, cos, sin):
     输入：
         q,k,v:shape(batch,seq_len,nums_head,head_dim)
         cos,sin :所有RoPE的角度表 shape(max_seq_len,head_dim/2)
+    输出：
+        output:shape(batch,seq_len,nums_head,head_dim)
     '''
     batch, seq_len, nums_head, head_dim = q.shape
     
