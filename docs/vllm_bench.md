@@ -42,3 +42,19 @@ vllm bench serve \
 | 64 | 8192 | 4 | 50 | 493.72 | 1003.24 | 105.18 | 7.71 |
 | 64 | 8192 | 16 | 50 | 1215.27 | 1243.57 | 298.87 | 7.84 |
 | 64 | 8192 | 32 | 50 | 2113.48 | 1577.68 | 448.84 | 8.89 |
+
+### 量化实验
+```
+vllm serve /data/Qwen3.5-2B \
+ --quantization bitsandbytes \
+ --gpu_memory_utilization 0.8 \
+ --port 8030 \
+ --max-model-len 4096 \
+ --no-enable-log-requests \
+ --no-enable-prefix-caching
+```
+|模型|精度|吞吐量(tok/s)|Mean TTFT(ms)|P99 TTFT(ms)|Mean TPOT(ms)|P99 TPOT(ms)|Mean ITL(ms)|P99 ITL(ms)|
+|-----|-----|-----|-----|-----|------|------|-----|-----|
+|Qwen3.5-2B|fp16|860.40|141.58|207.10|7.40|7.86|7.40|11.37|
+|Qwen3.5-2B|int8|825.6|215.39|318.57|7.23|8.0|7.23|11.39|
+这种动态量化的方法由于新增了运算成本，TTFT的值反而会有增加，如果将量化后的权重缓存，会降低
