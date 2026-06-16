@@ -1,2 +1,8 @@
-# llm-inference
-My llm study inference
+# 本项目主要记录了llm推理的学习
+
+## code
+记录了vllm学习中的代码，具体代码功效如目录下的README.md可见
+
+## docs
+记录了vllm学习中一些性能测试结果，以及code目录下代码执行的结果。
+vllm_bench.md中对比了不同参数下的模型推理结果，以及不同量化模型的模型推理测试结果
