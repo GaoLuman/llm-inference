@@ -72,3 +72,24 @@ vllm serve /data/Qwen3.5-2B-W8A8-Dynamic-Per-Token \
 - bitsandbytes是一种实时量化方法，需要模型加载时启动量化，启动速度会变慢。  
 - 本案例中发现量化后的ttft升高而tpot降低。ttft由Prefill阶段决定，tpot由Decode阶段决定，量化后的模型Prefill阶段需要做反量化计算，反而可能增高。但是由于带宽压力减小，Decode阶段会变快。  
 - 量化不一定会增加吞吐量，因为降低了带宽，大部分时候会增加。但是如果吞吐量的限制不在带宽而是在Kernel启动延时等开销上时，由于反量化，可能还会降低。要结合实际情况来看
+
+```
+vllm serve /data/Qwen3.5-2B \
+ --gpu_memory_utilization 0.95 \
+ --port 8030 \
+ --max-model-len 4096 \
+ --no-enable-log-requests \
+ --no-enable-prefix-caching
+```
+```
+vllm serve /workspace/code/models/Qwen3.5-2B-AWQ-4bit \
+ --gpu_memory_utilization 0.95 \
+ --port 8030 \
+ --max-model-len 4096 \
+ --no-enable-log-requests \
+ --no-enable-prefix-caching
+```
+|模型|精度|显存|吞吐量(tok/s)|Mean TTFT(ms)|P99 TTFT(ms)|Mean TPOT(ms)|P99 TPOT(ms)|Mean ITL(ms)|P99 ITL(ms)|
+|-----|-----|-----|-----|-----|-----|------|------|-----|-----|
+|Qwen3.5-2B|fp16|4.25GB|949.51|136.95|197.04|6.64|7.07|6.64|8.17|
+|Qwen3.5-2B-AWQ-4bit|int4|2.43GB|1421.6|139.86|199.79|4.08|4.64|4.08|5.51|
